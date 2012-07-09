@@ -127,137 +127,113 @@ proc cell_utils_update_qr_exp() { local logdiff
 }
 
 proc conductance_set_levels() { local amech, chg, extra1, extra2  localobj level_values
-		amech = $2
-		chg = $3
-		extra1 = $4
-		extra2 = $5
-		//		possible way to extend with extra dim
-		//		strdef cmdstr1
-		//		cmdstr1 = $s12
-		//    later execute(cmdstr1) conditionally
-		level_values = new Vector(0)
-		level_values.append($6*chg, $7*chg, $8*chg, $9*chg, $10*chg, $11*chg, $12*chg, $13*chg, $14*chg, $15*chg)
-		for i=0, level_values.size()-1 {
-				// print "changing level:", i
-				forsec $o1.level[i] {
-						// loop over mechanisms
-						// print "-section:", secname()
-						if ( level_values.x[i] > 0 ) {	// using negative gbar to indicate no mechanism present
-								// NOTE: ek, etc.. is not set on no mechanism segments
-								// --
-								if (amech == 1 && cu_mode == 1 ) { insert ar
-										gbar_ar = level_values.x[i] 
-										m0_ar = extra1
-										erev_ar = extra2
-										// m0_ar = 0
-										// erev_ar = -40
-								} 
-								// alternate mechanism to investigate shifting rest
-								if (amech == 1 && cu_mode == 2) { insert arx
-										gbar_arx = level_values.x[i] 
-										m0_arx = extra1
-										erev_arx = extra2
-										xn_arx = -30
-										// m0_ar = 0
-										// erev_ar = -40
-								} 
-								if (amech == 2 ) { insert cad
-										beta_cad = level_values.x[i] 
-										phi_cad = extra1
-										// phi_cad = 260000
-								} 
-								if (amech == 3 ) { insert cal
-										gbar_cal = level_values.x[i] 
-								} 
-								if (amech == 4 ) { insert cat_a
-										gbar_cat_a = level_values.x[i] 
-								} 
-								if (amech == 5 ) { insert k2
-										gbar_k2 = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-			// if (amech == 5 && cu_mode == 2) { insert k2x
-			// 							gbar_k2x = level_values.x[i] 
-			// 							ek = extra2
-			// 							xn_k2x = 20
-			// 							// ek = -100
-			// } 
-								if (amech == 6 ) { insert ka
-										gbar_ka = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-			// if (amech == 6 && cu_mode == 2 ) { insert kax
-			// 							gbar_kax = level_values.x[i] 
-			// 							ek = extra2
-			// 							xn_kax = 20
-			// 							// ek = -100
-			// } 
-								if (amech == 7 ) { insert kahp_slower										
-										gbar_kahp_slower = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-								if (amech == 8 ) { insert kc_fast	
-										gbar_kc_fast = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-								if (amech == 9 ) { insert kdr_fs
-										gbar_kdr_fs = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-								if (amech == 10 ) { insert km
-										gbar_km = level_values.x[i] 
-										ek = extra2
-										// ek = -100
-								} 
-								if (amech == 11 && cu_mode == 1) { insert naf2
-										gbar_naf2 = level_values.x[i]
-										fastNa_shift_naf2 = extra1
-										ena = extra2
-										// fastNa_shift_naf2 = -2.5
-										// ena = 50
-								} 
-								if (amech ==11 && cu_mode == 2) { insert naf2x
-										gbar_naf2x = level_values.x[i]
-										fastNa_shift_naf2x = extra1
-										ena = extra2
-										xn_naf2x = 0
-										// fastNa_shift_naf2 = -2.5
-										// ena = 50
-								} 
-								if (amech == 12 ) { insert napf_spinstell
-										gbar_napf_spinstell = level_values.x[i]
-										extra1=-2.5
-										ena = extra2
-										// fastNa_shift_napf_spinstell = -2.5
-										// ena = 50
-								} 
-								// non standard naming
-								if (amech == 13 ) { 
-										e_pas = extra2
-										g_pas = level_values.x[i] 
-								}
-								if (amech == 14 ) { 
-										cm = level_values.x[i] 
-								}
-								if (amech == 15 ) { 
-										Ra = level_values.x[i] 
-								}
-								if (amech == 16 ) { // other settings
-									//	vca = 125.      // - hardcoded in the mod files
-									//	e_gaba_a = -75  // - ? can't find connection/use
+		if (cu_mode > 1) {
+				// run system with alternative mechanisms
+				conductance_set_levels_alt($o1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+		} else {
+				amech = $2
+				chg = $3
+				extra1 = $4
+				extra2 = $5
+				//		possible way to extend with extra dim
+				//		strdef cmdstr1
+				//		cmdstr1 = $s12
+				//    later execute(cmdstr1) conditionally
+				level_values = new Vector(0)
+				level_values.append($6*chg, $7*chg, $8*chg, $9*chg, $10*chg, $11*chg, $12*chg, $13*chg, $14*chg, $15*chg)
+				for i=0, level_values.size()-1 {
+						// print "changing level:", i
+						forsec $o1.level[i] {
+								// loop over mechanisms
+								// print "-section:", secname()
+								if ( level_values.x[i] > 0 ) {	// using negative gbar to indicate no mechanism present
+										// NOTE: ek, etc.. is not set on no mechanism segments
+										// --
+										if (amech == 1) { insert ar
+												gbar_ar = level_values.x[i] 
+												m0_ar = extra1
+												erev_ar = extra2
+												// m0_ar = 0
+												// erev_ar = -40
+										} 
+										if (amech == 2 ) { insert cad
+												beta_cad = level_values.x[i] 
+												phi_cad = extra1
+												// phi_cad = 260000
+										} 
+										if (amech == 3 ) { insert cal
+												gbar_cal = level_values.x[i] 
+										} 
+										if (amech == 4 ) { insert cat_a
+												gbar_cat_a = level_values.x[i] 
+										} 
+										if (amech == 5 ) { insert k2
+												gbar_k2 = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 6 ) { insert ka
+												gbar_ka = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 7 ) { insert kahp_slower										
+												gbar_kahp_slower = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 8 ) { insert kc_fast	
+												gbar_kc_fast = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 9 ) { insert kdr_fs
+												gbar_kdr_fs = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 10 ) { insert km
+												gbar_km = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 11 ) { insert naf2
+												gbar_naf2 = level_values.x[i]
+												fastNa_shift_naf2 = extra1
+												ena = extra2
+												// fastNa_shift_naf2 = -2.5
+												// ena = 50
+										} 
+										if (amech == 12 ) { insert napf_spinstell
+												gbar_napf_spinstell = level_values.x[i]
+												extra1=-2.5
+												ena = extra2
+												// fastNa_shift_napf_spinstell = -2.5
+												// ena = 50
+										} 
+										// non standard naming
+										if (amech == 13 ) { 
+												e_pas = extra2
+												g_pas = level_values.x[i] 
+										}
+										if (amech == 14 ) { 
+												cm = level_values.x[i] 
+										}
+										if (amech == 15 ) { 
+												Ra = level_values.x[i] 
+										}
+										if (amech == 16 ) { // other settings
+												//	vca = 125.      // - hardcoded in the mod files
+												//	e_gaba_a = -75  // - ? can't find connection/use
+										}
 								}
 						}
 				}
+				// change conductance
 		}
-		// change conductance
 }
-
-// ---- conductance set levels sum
+		
+		// ---- conductance set levels sum
 proc conductance_set_levels_sum() { local amech, chg, extra1, extra2  localobj level_values
 		amech = $2
 		chg = $3
@@ -358,6 +334,144 @@ proc conductance_set_levels_sum() { local amech, chg, extra1, extra2  localobj l
 		}
 		// change conductance
 }
+
+
+proc conductance_set_levels_alt() { local amech, chg, extra1, extra2  localobj level_values
+		amech = $2
+		chg = $3
+		extra1 = $4
+		extra2 = $5
+		//		possible way to extend with extra dim
+		//		strdef cmdstr1
+		//		cmdstr1 = $s12
+		//    later execute(cmdstr1) conditionally
+		level_values = new Vector(0)
+		level_values.append($6*chg, $7*chg, $8*chg, $9*chg, $10*chg, $11*chg, $12*chg, $13*chg, $14*chg, $15*chg)
+		for i=0, level_values.size()-1 {
+				// print "changing level:", i
+				forsec $o1.level[i] {
+						// loop over mechanisms
+						// print "-section:", secname()
+						if ( level_values.x[i] > 0 ) {	// using negative gbar to indicate no mechanism present
+								// NOTE: ek, etc.. is not set on no mechanism segments
+								// --
+								if (cu_mode == 2) {
+										if (amech == 1 ) { insert ar
+												gbar_ar = level_values.x[i] 
+												m0_ar = extra1
+												erev_ar = extra2
+												// m0_ar = 0
+												// erev_ar = -40
+										} 
+										if (amech == 2 ) { insert cad
+												beta_cad = level_values.x[i] 
+												phi_cad = extra1
+												// phi_cad = 260000
+										} 
+										if (amech == 3 ) { insert cal
+												gbar_cal = level_values.x[i] 
+										} 
+										if (amech == 4 ) { insert cat_a
+												gbar_cat_a = level_values.x[i] 
+										} 
+										if (amech == 5 ) { insert k2
+												gbar_k2 = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 6 ) { insert ka
+												gbar_ka = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 7 ) { insert kahp_slower										
+												gbar_kahp_slower = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 8 ) { insert kc_fastx	
+												gbar_kc_fast = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 9 ) { insert kdr_fs
+												gbar_kdr_fs = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 10 ) { insert km
+												gbar_km = level_values.x[i] 
+												ek = extra2
+												// ek = -100
+										} 
+										if (amech == 11 ) { insert naf2
+												gbar_naf2 = level_values.x[i]
+												fastNa_shift_naf2 = extra1
+												ena = extra2
+												// fastNa_shift_naf2 = -2.5
+												// ena = 50
+										} 										
+										if (amech == 12 ) { insert napf_spinstell
+												gbar_napf_spinstell = level_values.x[i]
+												extra1=-2.5
+												ena = extra2
+												// fastNa_shift_napf_spinstell = -2.5
+												// ena = 50
+										} 
+										// non standard naming
+										if (amech == 13 ) { 
+												e_pas = extra2
+												g_pas = level_values.x[i] 
+										}
+										if (amech == 14 ) { 
+												cm = level_values.x[i] 
+										}
+										if (amech == 15 ) { 
+												Ra = level_values.x[i] 
+										}
+										if (amech == 16 ) { // other settings
+												//	vca = 125.      // - hardcoded in the mod files
+												//	e_gaba_a = -75  // - ? can't find connection/use
+										}
+										
+								} else if (cu_mode == 3) {
+										// alternate mechanism to investigate shifting rest
+										// these settings are incomplete, stored here just as future reference
+										if (amech == 1) { insert arx
+												gbar_arx = level_values.x[i] 
+												m0_arx = extra1
+												erev_arx = extra2
+												xn_arx = -30
+												// m0_ar = 0
+												// erev_ar = -40
+										} 
+										if (amech == 5 && cu_mode == 3) { insert k2x
+			 									gbar_k2x = level_values.x[i] 
+			 									ek = extra2
+			 									xn_k2x = 20
+			 									// ek = -100
+										} 
+										if (amech == 6 && cu_mode == 3 ) { insert kax
+			 									gbar_kax = level_values.x[i] 
+			 									ek = extra2
+			 									xn_kax = 20
+			 									// ek = -100
+										} 										
+										if (amech ==11 && cu_mode == 3) { insert naf2x
+												gbar_naf2x = level_values.x[i]
+												fastNa_shift_naf2x = extra1
+												ena = extra2
+												xn_naf2x = 0
+												// fastNa_shift_naf2 = -2.5
+												// ena = 50
+										} 
+								}
+						}
+				}
+		}
+		// change conductance
+}
+
 
 
 

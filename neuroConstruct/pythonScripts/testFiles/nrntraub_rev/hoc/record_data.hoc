@@ -4,6 +4,8 @@ if (!name_declared("cu_mode")) {
 		cu_mode=1
 } 
 
+strdef rd_tmp
+
 // for recording data
 objref null
 objref rd_sfunc
@@ -484,7 +486,6 @@ proc record_data_disk_summary_val() {
 }
 
 
-
 // strdef mytstr1
 // for i=1,1 {getstr(mytstr1) plot_params_.append(new String(mytstr1))}
 // 0  -80  500  120  xlabel_text  ylabel_text  graph_text
@@ -495,3 +496,14 @@ proc record_data_disk_summary_val() {
 // for j=0, plot_params_.count()-1 {
 // 		print plot_params_.o[j]
 // }
+				
+proc record_data_export_text() { localobj mview_export
+		system("date '+%Y-%m-%d_%H%M-%S'", rd_tstamp)
+		rd_sfunc.left(rd_tstamp,18)
+
+		mview_export = new ModelView(0)
+		sprint(rd_tmp, "ss_cu_%d_%s.txt", $1,rd_tstamp)
+		mview_export.textp(rd_tmp)
+		mview_export.destroy()
+		// objref m		
+}

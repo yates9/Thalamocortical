@@ -148,9 +148,9 @@ proc make_figure() { local idx1, deltat, maxt  localobj vf, tf, g
 		pointvclamp.dur1=3/5*max_x_coord
 		pointvclamp.dur2=1/5*max_x_coord
 		pointvclamp.dur3=0      // unsure?
-		pointvclamp.amp1=-68.4
+		pointvclamp.amp1=v0
 		pointvclamp.amp2=-120   // variable 
-		pointvclamp.amp3=-68.4
+		pointvclamp.amp3=v0
 		pointvclampstart=min_y_coord
 		pointvclampend=-40
 		pointvclamp.rs=1*10^-7 // or 10^-3 or less
@@ -203,6 +203,7 @@ proc make_figure() { local idx1, deltat, maxt  localobj vf, tf, g
 		sprint(vstr1, "cell.comp[%d].v(.5)", 1) //  cell.presyn_comp = 57
 		myg.addvar(vstr1, 1+($1>2), 1) // color, brush
 		
+		rd_gname = vstr
 		
 		for bati=0, numsims-1 {
 				access cell.comp[1]
@@ -214,10 +215,8 @@ proc make_figure() { local idx1, deltat, maxt  localobj vf, tf, g
 				// describe parameters for this simulation
 				sprint(lstr,"vclamp=%lf,scale_%lf_(%s),tbexact=%d",pointvclamp.amp2,qr.x[mech_ref-1],mechshortname,exact_)
 				print lstr				
-				rd_gname=vstr // name from first key in table
 				
 				cell_utils_spinstell_setup_mechanisms()
-				
 				
 				if (segoption == 0) {
 						// normal run
@@ -260,6 +259,7 @@ proc make_figure() { local idx1, deltat, maxt  localobj vf, tf, g
 						 		if (ismembrane("napf_spinstell")) { gbar_napf_spinstell=1e-12 }
 						}						
 				}
+				
 				
 				
 				// record_data_vt() // for debugging traces
